@@ -45,13 +45,50 @@ server.post('/api/login', (req, res) => {
     });
 });
 
-server.get('/api/login', (req, res) => {
+server.get('/api/login', restricted, (req, res) => {
   Users.find()
     .then(users => {
       res.json(users);
     })
     .catch(err => res.send(err));
 });
+function only(username) {
+  return function(req, res, next) {
+    if (req.headers.username === username) {
+      next();
+    } else {
+      res.status(403).json({ message: `you are not ${username}` });
+    }
+  };
+}
+function authorized(req, res, next) {
+  const { username, password } = req.headers;
+  if (username && password) {
+    Users.findBy({ username });
+  } else {
+    return status(400).json({ message: 'you are not registered.' });
+  }
+}
+function restricted(req, res, next) {
+  const { username, password } = req.headers;
+
+  if (username && password) {
+    Users.findBy({ username })
+      .first()
+      .then(user => {
+        if (user && bcrypt.compareSync(password, user.password)) {
+          next();
+        } else {
+          res.status(401).json({ message: 'You shall not pass!!' });
+        }
+      })
+      .catch(error => {
+        res.status(500).json(error);
+      });
+  } else {
+    res.status(401).json({ message: 'Please provide credentials' });
+  }
+}
 
 const port = process.env.PORT || 5000;
 server.listen(port, () => console.log(`\n** Running on port ${port} **\n`));
