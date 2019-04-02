@@ -1,6 +1,5 @@
 module.exports = (req, res, next) => {
   try {
-    // if this throws, please don't crash my app
     if (req && req.session && req.session.user) {
       next();
     } else {
