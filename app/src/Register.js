@@ -13,7 +13,7 @@ class Register extends Component {
   };
   registerUser = () => {
     axios
-      .post('http://localhost:5000/api/register', {
+      .post('http://localhost:5000/api/auth/register', {
         username: this.state.username,
         password: this.state.password
       })
@@ -33,13 +33,13 @@ class Register extends Component {
             type="text"
             name="username"
             placeholder="username"
-            value={this.username}
+            value={this.state.username}
             onChange={e => this.inputChange(e)}
           />
           <input
             type="password"
             placeholder="password"
-            value={this.password}
+            value={this.state.password}
             onChange={e => this.inputChange(e)}
             name="password"
           />
